@@ -191,6 +191,7 @@ window.onerror = function(msg, url, line) {
 };
 
 const SUITS = {
+const SUITS = {
   hammers: { name: "Молоты", stat: "Сила" },
   keys:    { name: "Ключи",  stat: "Ловкость" },
   shields: { name: "Щиты",   stat: "Выносливость" },
@@ -200,30 +201,12 @@ const SUITS = {
 };
 
 const CHAPTERS = [
-  {
-    id: 1, title: "Глава 1: На краю анархии", suit: "keys",
-    spend: "Трата Очков Харроу: переброс проверки Ловкости (до оглашения результата), +1 к скорости на сцену или бонус уклонения +2 к КБ на 1 раунд."
-  },
-  {
-    id: 2, title: "Глава 2: Семь дней до могилы", suit: "shields",
-    spend: "Трата Очков Харроу: переброс спасброска Стойкости или проверки Выносливости, +2 к спасброскам против болезней на день, либо лечение 1к8+уровень ПЗ."
-  },
-  {
-    id: 3, title: "Глава 3: Побег из Старой Корвосы", suit: "books",
-    spend: "Трата Очков Харроу: переброс проверки Интеллекта или Знаний, получение подсказки от ведущего, либо +2 к КБ/спасброскам против ловушек и загадок."
-  },
-  {
-    id: 4, title: "Глава 4: История пепла", suit: "hammers",
-    spend: "Трата Очков Харроу: переброс броска атаки или проверки Силы, +2 к урону в ближнем бою на 1 раунд, либо игнорирование штрафных условий усталости на сцену."
-  },
-  {
-    id: 5, title: "Глава 5: Скелеты Скарволла", suit: "stars",
-    spend: "Трата Очков Харроу: переброс спасброска Воли или проверки Внимания/Проницательности, либо +2 к спасброскам против эффектов страха и нежити."
-  },
-  {
-    id: 6, title: "Глава 6: Корона клыков", suit: "crowns",
-    spend: "Трата Очков Харроу: переброс проверки Харизмы (Дипломатия, Блеф, Запугивание) или бонус +2 к КБ/спасброскам против зачарования и контроля разума."
-  }
+  { id: 1, title: "Глава 1: На краю анархии", suit: "keys", spend: "Трата Очков Харроу: переброс проверки Ловкости (до оглашения результата), +1 к скорости на сцену или бонус уклонения +2 к КБ на 1 раунд." },
+  { id: 2, title: "Глава 2: Семь дней до могилы", suit: "shields", spend: "Трата Очков Харроу: переброс спасброска Стойкости или проверки Выносливости, +2 к спасброскам против болезней на день, либо лечение 1к8+уровень ПЗ." },
+  { id: 3, title: "Глава 3: Побег из Старой Корвосы", suit: "books", spend: "Трата Очков Харроу: переброс проверки Интеллекта или Знаний, получение подсказки от ведущего, либо +2 к КБ/спасброскам против ловушек и загадок." },
+  { id: 4, title: "Глава 4: История пепла", suit: "hammers", spend: "Трата Очков Харроу: переброс броска атаки или проверки Силы, +2 к урону в ближнем бою на 1 раунд, либо игнорирование штрафных условий усталости на сцену." },
+  { id: 5, title: "Глава 5: Скелеты Скарволла", suit: "stars", spend: "Трата Очков Харроу: переброс спасброска Воли или проверки Внимания/Проницательности, либо +2 к спасброскам против эффектов страха и нежити." },
+  { id: 6, title: "Глава 6: Корона клыков", suit: "crowns", spend: "Трата Очков Харроу: переброс проверки Харизмы (Дипломатия, Блеф, Запугивание) или бонус +2 к КБ/спасброскам против зачарования и контроля разума." }
 ];
 
 const ALIGNMENTS = [
@@ -232,287 +215,305 @@ const ALIGNMENTS = [
   "Законно-Злой", "Нейтрально-Злой", "Хаотично-Злой"
 ];
 
-const OPPOSITE_SLOTS = [8, 7, 6, 5, 4, 3, 2, 1, 0];
+const OPPOSITE_MAP = "876543210";
 
 const RAW_CARDS = [
-{ ru: "Паладин", en: "Paladin", suit: "hammers", file: "01_paladin.png" },
-{ ru: "Твердыня", en: "Keep", suit: "hammers", file: "02_keep.png" },
-{ ru: "Небо", en: "Sky", suit: "hammers", file: "03_sky.png" },
-{ ru: "Кузница", en: "Forge", suit: "hammers", file: "04_forge.png" },
-{ ru: "Медведь", en: "Bear", suit: "hammers", file: "05_bear.png" },
-{ ru: "Восстание", en: "Uprising", suit: "hammers", file: "06_uprising.png" },
-{ ru: "Исчадие", en: "Fiend", suit: "hammers", file: "07_fiend.png" },
-{ ru: "Избиение", en: "Beating", suit: "hammers", file: "08_beating.png" },
-{ ru: "Циклон", en: "Cyclone", suit: "hammers", file: "09_cyclone.png" },
-{ ru: "Танец", en: "Dance", suit: "keys", file: "10_dance.png" },
-{ ru: "Сверчок", en: "Cricket", suit: "keys", file: "11_cricket.png" },
-{ ru: "Жонглёр", en: "Juggler", suit: "keys", file: "12_juggler.png" },
-{ ru: "Замочник", en: "Locksmith", suit: "keys", file: "13_locksmith.png" },
-{ ru: "Павлин", en: "Peacock", suit: "keys", file: "14_peacock.png" },
-{ ru: "Кролик", en: "Rabbit", suit: "keys", file: "15_rabbit.png" },
-{ ru: "Лавина", en: "Avalanche", suit: "keys", file: "16_avalanche.png" },
-{ ru: "Вороны", en: "Crows", suit: "keys", file: "17_crows.png" },
-{ ru: "Фонарь", en: "Lantern", suit: "keys", file: "18_lantern.png" },
-{ ru: "Труба", en: "Trumpet", suit: "shields", file: "19_trumpet.png" },
-{ ru: "Выживший", en: "Survivor", suit: "shields", file: "20_survivor.png" },
-{ ru: "Пустыня", en: "Desert", suit: "shields", file: "21_desert.png" },
-{ ru: "Медь", en: "Brass", suit: "shields", file: "22_brass.png" },
-{ ru: "Возница", en: "Teamster", suit: "shields", file: "23_teamster.png" },
-{ ru: "Гора", en: "Mountain", suit: "shields", file: "24_mountain.png" },
-{ ru: "Терновник", en: "Briar", suit: "shields", file: "25_briar.png" },
-{ ru: "Хворь", en: "Sickness", suit: "shields", file: "26_sickness.png" },
-{ ru: "Восковые фигуры", en: "Waxworks", suit: "shields", file: "27_waxworks.png" },
-{ ru: "Истина", en: "Truth", suit: "books", file: "28_truth.png" },
-{ ru: "Странник", en: "Wanderer", suit: "books", file: "29_wanderer.png" },
-{ ru: "Шутка", en: "Joke", suit: "books", file: "30_joke.png" },
-{ ru: "Инквизитор", en: "Inquisitor", suit: "books", file: "31_inquisitor.png" },
-{ ru: "Торговец", en: "Trader", suit: "books", file: "32_trader.png" },
-{ ru: "Видение", en: "Vision", suit: "books", file: "33_vision.png" },
-{ ru: "Ракшаса", en: "Rakshasa", suit: "books", file: "34_rakshasa.png" },
-{ ru: "Идиот", en: "Idiot", suit: "books", file: "35_idiot.png" },
-{ ru: "Змеиный укус", en: "Snakebite", suit: "books", file: "36_snakebite.png" },
-{ ru: "Змей", en: "Serpent", suit: "stars", file: "37_serpent.png" },
-{ ru: "Повитуха", en: "Midwife", suit: "stars", file: "38_midwife.png" },
-{ ru: "Трактирщик", en: "Publican", suit: "stars", file: "39_publican.png" },
-{ ru: "Королева", en: "Queen", suit: "stars", file: "40_queen.png" },
-{ ru: "Сова", en: "Owl", suit: "stars", file: "41_owl.png" },
-{ ru: "Карнавал", en: "Carnival", suit: "stars", file: "42_carnival.png" },
-{ ru: "Затмение", en: "Eclipse", suit: "stars", file: "43_eclipse.png" },
-{ ru: "Карга", en: "Hag", suit: "stars", file: "44_hag.png" },
-{ ru: "Потерянный", en: "Lost", suit: "stars", file: "45_lost.png" },
-{ ru: "Трон", en: "Throne", suit: "crowns", file: "46_throne.png" },
-{ ru: "Театр", en: "Theater", suit: "crowns", file: "47_theater.png" },
-{ ru: "Единорог", en: "Unicorn", suit: "crowns", file: "48_unicorn.png" },
-{ ru: "Брак", en: "Marriage", suit: "crowns", file: "49_marriage.png" },
-{ ru: "Близнец", en: "Twin", suit: "crowns", file: "50_twin.png" },
-{ ru: "Куртизанка", en: "Courtesan", suit: "crowns", file: "51_courtesan.png" },
-{ ru: "Тиран", en: "Tyrant", suit: "crowns", file: "52_tyrant.png" },
-{ ru: "Предательство", en: "Betrayal", suit: "crowns", file: "53_betrayal.png" },
-{ ru: "Лжец", en: "Liar", suit: "crowns", file: "54_liar.png" }
+  { ru: "Паладин", en: "Paladin", suit: "hammers", file: "01_paladin.png" },
+  { ru: "Твердыня", en: "Keep", suit: "hammers", file: "02_keep.png" },
+  { ru: "Небо", en: "Sky", suit: "hammers", file: "03_sky.png" },
+  { ru: "Кузница", en: "Forge", suit: "hammers", file: "04_forge.png" },
+  { ru: "Медведь", en: "Bear", suit: "hammers", file: "05_bear.png" },
+  { ru: "Восстание", en: "Uprising", suit: "hammers", file: "06_uprising.png" },
+  { ru: "Исчадие", en: "Fiend", suit: "hammers", file: "07_fiend.png" },
+  { ru: "Избиение", en: "Beating", suit: "hammers", file: "08_beating.png" },
+  { ru: "Циклон", en: "Cyclone", suit: "hammers", file: "09_cyclone.png" },
+  { ru: "Танец", en: "Dance", suit: "keys", file: "10_dance.png" },
+  { ru: "Сверчок", en: "Cricket", suit: "keys", file: "11_cricket.png" },
+  { ru: "Жонглёр", en: "Juggler", suit: "keys", file: "12_juggler.png" },
+  { ru: "Замочник", en: "Locksmith", suit: "keys", file: "13_locksmith.png" },
+  { ru: "Павлин", en: "Peacock", suit: "keys", file: "14_peacock.png" },
+  { ru: "Кролик", en: "Rabbit", suit: "keys", file: "15_rabbit.png" },
+  { ru: "Лавина", en: "Avalanche", suit: "keys", file: "16_avalanche.png" },
+  { ru: "Вороны", en: "Crows", suit: "keys", file: "17_crows.png" },
+  { ru: "Фонарь", en: "Lantern", suit: "keys", file: "18_lantern.png" },
+  { ru: "Труба", en: "Trumpet", suit: "shields", file: "19_trumpet.png" },
+  { ru: "Выживший", en: "Survivor", suit: "shields", file: "20_survivor.png" },
+  { ru: "Пустыня", en: "Desert", suit: "shields", file: "21_desert.png" },
+  { ru: "Медь", en: "Brass", suit: "shields", file: "22_brass.png" },
+  { ru: "Возница", en: "Teamster", suit: "shields", file: "23_teamster.png" },
+  { ru: "Гора", en: "Mountain", suit: "shields", file: "24_mountain.png" },
+  { ru: "Терновник", en: "Briar", suit: "shields", file: "25_briar.png" },
+  { ru: "Хворь", en: "Sickness", suit: "shields", file: "26_sickness.png" },
+  { ru: "Восковые фигуры", en: "Waxworks", suit: "shields", file: "27_waxworks.png" },
+  { ru: "Истина", en: "Truth", suit: "books", file: "28_truth.png" },
+  { ru: "Странник", en: "Wanderer", suit: "books", file: "29_wanderer.png" },
+  { ru: "Шутка", en: "Joke", suit: "books", file: "30_joke.png" },
+  { ru: "Инквизитор", en: "Inquisitor", suit: "books", file: "31_inquisitor.png" },
+  { ru: "Торговец", en: "Trader", suit: "books", file: "32_trader.png" },
+  { ru: "Видение", en: "Vision", suit: "books", file: "33_vision.png" },
+  { ru: "Ракшаса", en: "Rakshasa", suit: "books", file: "34_rakshasa.png" },
+  { ru: "Идиот", en: "Idiot", suit: "books", file: "35_idiot.png" },
+  { ru: "Змеиный укус", en: "Snakebite", suit: "books", file: "36_snakebite.png" },
+  { ru: "Змей", en: "Serpent", suit: "stars", file: "37_serpent.png" },
+  { ru: "Повитуха", en: "Midwife", suit: "stars", file: "38_midwife.png" },
+  { ru: "Трактирщик", en: "Publican", suit: "stars", file: "39_publican.png" },
+  { ru: "Королева", en: "Queen", suit: "stars", file: "40_queen.png" },
+  { ru: "Сова", en: "Owl", suit: "stars", file: "41_owl.png" },
+  { ru: "Карнавал", en: "Carnival", suit: "stars", file: "42_carnival.png" },
+  { ru: "Затмение", en: "Eclipse", suit: "stars", file: "43_eclipse.png" },
+  { ru: "Карга", en: "Hag", suit: "stars", file: "44_hag.png" },
+  { ru: "Потерянный", en: "Lost", suit: "stars", file: "45_lost.png" },
+  { ru: "Трон", en: "Throne", suit: "crowns", file: "46_throne.png" },
+  { ru: "Театр", en: "Theater", suit: "crowns", file: "47_theater.png" },
+  { ru: "Единорог", en: "Unicorn", suit: "crowns", file: "48_unicorn.png" },
+  { ru: "Брак", en: "Marriage", suit: "crowns", file: "49_marriage.png" },
+  { ru: "Близнец", en: "Twin", suit: "crowns", file: "50_twin.png" },
+  { ru: "Куртизанка", en: "Courtesan", suit: "crowns", file: "51_courtesan.png" },
+  { ru: "Тиран", en: "Tyrant", suit: "crowns", file: "52_tyrant.png" },
+  { ru: "Предательство", en: "Betrayal", suit: "crowns", file: "53_betrayal.png" },
+  { ru: "Лжец", en: "Liar", suit: "crowns", file: "54_liar.png" }
 ];
+
 const DECK = RAW_CARDS.map((c, idx) => ({
-id: idx,
-ru: c.ru,
-en: c.en,
-suit: c.suit,
-file: "cards/" + c.file,
-alignIdx: idx % 9
+  id: idx, ru: c.ru, en: c.en, suit: c.suit, file: "cards/" + c.file, alignIdx: idx % 9
 }));
-let state = {
-chapter: 1,
-players: [],
-spread: [],
-revealed: [false, false, false, false, false, false, false, false, false],
-extra: []
-};
+
+let state = { chapter: 1, players: [], spread: [], revealed: [false,false,false,false,false,false,false,false,false], extra: [] };
+
+function encodeState(obj) {
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin = "";
+  bytes.forEach(b => { bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodeState(str) {
+  let b64 = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (b64.length % 4) b64 += "=";
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes.set(Uint8Array.of(bin.charCodeAt(i)), i);
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 function init() {
-const sel = document.getElementById("chapterSelect");
-CHAPTERS.forEach(ch => {
-const opt = document.createElement("option");
-opt.value = ch.id;
-opt.textContent = ch.title + " (" + SUITS[ch.suit].name + ")";
-sel.appendChild(opt);
-});
-if (location.hash.length > 1) {
-try {
-const decoded = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
-Object.assign(state, decoded);
-} catch (e) {}
+  const sel = document.getElementById("chapterSelect");
+  CHAPTERS.forEach(ch => {
+    const opt = document.createElement("option");
+    opt.value = ch.id;
+    opt.textContent = ch.title + " (" + SUITS[ch.suit].name + ")";
+    sel.appendChild(opt);
+  });
+  if (location.hash.length > 1) {
+    try { Object.assign(state, decodeState(location.hash.slice(1))); } catch (e) {}
+  }
+  sel.value = state.chapter;
+  render();
 }
-sel.value = state.chapter;
-render();
-}
+
 function saveToHash() {
-const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-history.replaceState(null, "", "#" + encoded);
+  try { history.replaceState(null, "", "#" + encodeState(state)); } catch (e) {}
 }
+
 function changeChapter() {
-state.chapter = Number(document.getElementById("chapterSelect").value);
-render();
+  state.chapter = Number(document.getElementById("chapterSelect").value);
+  render();
 }
+
 function addPlayer() {
-const inp = document.getElementById("playerNameInput");
-const name = inp.value.trim();
-if (!name) return;
-if (state.players.length >= 9) {
-alert("Максимум 9 игроков на 9 карт масти!");
-return;
+  const inp = document.getElementById("playerNameInput");
+  const name = inp.value.trim();
+  if (!name) return;
+  if (state.players.length >= 9) { alert("Максимум 9 игроков!"); return; }
+  state.players.push({ name: name, roleCardId: null });
+  inp.value = "";
+  render();
 }
-state.players.push({ name: name, roleCardId: null });
-inp.value = "";
-render();
-}
+
 function removePlayer(idx) {
-state.players.splice(idx, 1);
-render();
+  state.players.splice(idx, 1);
+  render();
 }
+
 function dealRoleCards() {
-if (state.players.length === 0) {
-alert("Сначала добавьте хотя бы одного игрока.");
-return;
+  if (state.players.length === 0) { alert("Сначала добавьте игрока."); return; }
+  const ch = CHAPTERS.find(c => c.id === state.chapter);
+  const suitCards = DECK.filter(c => c.suit === ch.suit).map(c => c.id);
+  const shuffled = getShuffled(suitCards);
+  state.players.forEach((p, i) => { p.roleCardId = shuffled.at(i); });
+  render();
 }
-const ch = CHAPTERS.find(c => c.id === state.chapter);
-const suitCards = DECK.filter(c => c.suit === ch.suit).map(c => c.id);
-const shuffled = getShuffled(suitCards);
-state.players.forEach((p, i) => {
-p.roleCardId = shuffled.at(i);
-});
-render();
-}
+
 function dealSpread() {
-const ids = DECK.map(c => c.id);
-const shuffled = getShuffled(ids);
-state.spread = shuffled.slice(0, 9);
-state.revealed = [false, false, false, false, false, false, false, false, false];
-state.extra = [];
-render();
+  const shuffled = getShuffled(DECK.map(c => c.id));
+  state.spread = shuffled.slice(0, 9);
+  state.revealed = [false,false,false,false,false,false,false,false,false];
+  state.extra = [];
+  render();
 }
+
 function toggleReveal(slotIdx) {
-if (state.spread.length < 9) return;
-state.revealed = state.revealed.map((val, idx) => idx === slotIdx ? !val : val);
-render();
+  if (state.spread.length < 9) return;
+  state.revealed = state.revealed.map((val, idx) => idx === slotIdx ? !val : val);
+  render();
 }
+
 function revealAll() {
-if (state.spread.length < 9) return;
-state.revealed = [true, true, true, true, true, true, true, true, true];
-render();
+  if (state.spread.length < 9) return;
+  state.revealed = [true,true,true,true,true,true,true,true,true];
+  render();
 }
+
 function drawExtraCard() {
-const used = new Set([...state.spread, ...state.extra]);
-const avail = DECK.map(c => c.id).filter(id => !used.has(id));
-if (avail.length === 0) {
-alert("В колоде больше не осталось карт!");
-return;
+  const used = new Set([...state.spread, ...state.extra]);
+  const avail = DECK.map(c => c.id).filter(id => !used.has(id));
+  if (avail.length === 0) { alert("Колода пуста!"); return; }
+  state.extra.push(getShuffled(avail).at(0));
+  render();
 }
-const shuffled = getShuffled(avail);
-state.extra.push(shuffled.at(0));
-render();
-}
+
 function resetAll() {
-state = {
-chapter: state.chapter,
-players: [],
-spread: [],
-revealed: [false, false, false, false, false, false, false, false, false],
-extra: []
-};
-render();
+  state = { chapter: state.chapter, players: [], spread: [], revealed: [false,false,false,false,false,false,false,false,false], extra: [] };
+  history.replaceState(null, "", location.pathname);
+  render();
 }
+
 function copyShareLink() {
-saveToHash();
-navigator.clipboard.writeText(location.href).then(() => {
-const t = document.getElementById("toast");
-t.style.display = "block";
-setTimeout(() => t.style.display = "none", 2200);
-});
+  saveToHash();
+  const url = location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(showToast).catch(() => fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
 }
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand("copy");
+  document.body.removeChild(ta);
+  showToast();
+}
+
+function showToast() {
+  const t = document.getElementById("toast");
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 2200);
+}
+
 function getShuffled(arr) {
-return arr
-.map(item => ({ item: item, sort: Math.random() }))
-.sort((a, b) => a.sort - b.sort)
-.map(obj => obj.item);
+function getShuffled(arr) {
+  return arr.map(item => ({ item: item, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(o => o.item);
 }
+
 function calcHarrowPoints(player) {
-const ch = CHAPTERS.find(c => c.id === state.chapter);
-let hp = 0;
-state.spread.forEach((cardId, slotIdx) => {
-if (!state.revealed.at(slotIdx)) return;
-const card = DECK.at(cardId);
-if (card.suit === ch.suit) hp += 1;
-if (player.roleCardId === cardId) {
-hp += 1;
-if (card.alignIdx === slotIdx) hp += 1;
+  const ch = CHAPTERS.find(c => c.id === state.chapter);
+  let hp = 0;
+  state.spread.forEach((cardId, slotIdx) => {
+    if (!state.revealed.at(slotIdx)) return;
+    const card = DECK.at(cardId);
+    if (card.suit === ch.suit) hp += 1;
+    if (player.roleCardId === cardId) {
+      hp += 1;
+      if (card.alignIdx === slotIdx) hp += 1;
+    }
+  });
+  return hp;
 }
-});
-return hp;
-}
+
 function render() {
-saveToHash();
-const ch = CHAPTERS.find(c => c.id === state.chapter);
-const suitObj = SUITS[ch.suit];
-document.getElementById("chapterInfo").innerHTML =
-"Масть главы: " + suitObj.name + " (" + suitObj.stat + ")" +
-"" + ch.spend + "";
-const pList = document.getElementById("playersList");
-pList.innerHTML = "";
-state.players.forEach((p, idx) => {
-const rCard = p.roleCardId !== null ? DECK.at(p.roleCardId) : null;
-const hp = calcHarrowPoints(p);
-const div = document.createElement("div");
-div.className = "player-row";
-div.innerHTML =
-"" +
-"" + p.name + "" +
-"" + (rCard ? ("Роль: " + rCard.ru + " (" + rCard.en + ")") : "Карта Роли не вытянута") + "" +
-"" +
-"" +
-"" + hp + " ОХ" +
-"✕" +
-"";
-pList.appendChild(div);
-});
-const grid = document.getElementById("spreadGrid");
-grid.innerHTML = "";
-const rowLabels = ["Добро (Позитив)", "Нейтральность", "Зло (Негатив)"];
-for (let r = 0; r < 3; r++) {
-const lbl = document.createElement("div");
-lbl.className = "row-label";
-lbl.textContent = rowLabels.at(r);
-grid.appendChild(lbl);
-for (let c = 0; c < 3; c++) {
-const slotIdx = r * 3 + c;
-const slot = document.createElement("div");
-slot.className = "slot";
-slot.onclick = () => toggleReveal(slotIdx);
-if (state.spread.length < 9) {
-slot.innerHTML = "" + ALIGNMENTS.at(slotIdx) + "Пусто";
-} else {
-const card = DECK.at(state.spread.at(slotIdx));
-const isRev = state.revealed.at(slotIdx);
-const isSuitMatch = isRev && card.suit === ch.suit;
-const roleOwners = state.players.filter(p => p.roleCardId === card.id);
-if (isRev && roleOwners.length > 0) slot.classList.add("role-match");
-else if (isSuitMatch) slot.classList.add("suit-match");
-if (!isRev) {
-slot.innerHTML =
-"" + ALIGNMENTS.at(slotIdx) + "" +
-"✦" +
-"Нажмите, чтобы открыть";
-} else {
-let tagsHtml = "";
-if (isSuitMatch) tagsHtml += "Масть главы (+1 ОХ)";
-roleOwners.forEach(owner => {
-if (card.alignIdx === slotIdx) {
-tagsHtml += "★ Роль: " + owner.name + " (Истинное +2)";
-} else if (OPPOSITE_SLOTS.at(card.alignIdx) === slotIdx) {
-tagsHtml += "⚠ Роль: " + owner.name + " (Противопол. +1)";
-} else {
-tagsHtml += "Роль: " + owner.name + " (+1 ОХ)";
+  saveToHash();
+  const ch = CHAPTERS.find(c => c.id === state.chapter);
+  const suitObj = SUITS[ch.suit];
+  document.getElementById("chapterInfo").innerHTML =
+    "<div><strong>Масть главы:</strong> " + suitObj.name + " (" + suitObj.stat + ")</div>" +
+    "<div style='margin-top:6px;'>" + ch.spend + "</div>";
+
+  const pList = document.getElementById("playersList");
+  pList.innerHTML = "";
+  state.players.forEach((p, idx) => {
+    const rCard = p.roleCardId !== null ? DECK.at(p.roleCardId) : null;
+    const hp = calcHarrowPoints(p);
+    const div = document.createElement("div");
+    div.className = "player-row";
+    div.innerHTML =
+      "<div class='player-info'><strong>" + p.name + "</strong>" +
+      "<span class='player-role'>" + (rCard ? ("Роль: " + rCard.ru + " (" + rCard.en + ")") : "Карта Роли не вытянута") + "</span></div>" +
+      "<div style='display:flex; align-items:center; gap:6px;'>" +
+      "<span class='hp-badge'>" + hp + " ОХ</span>" +
+      "<button onclick='removePlayer(" + idx + ")' style='padding:4px 8px;'>✕</button></div>";
+    pList.appendChild(div);
+  });
+
+  const grid = document.getElementById("spreadGrid");
+  grid.innerHTML = "";
+  const rowLabels = ["Добро (Позитив)", "Нейтральность", "Зло (Негатив)"];
+
+  for (let r = 0; r < 3; r++) {
+    const lbl = document.createElement("div");
+    lbl.className = "row-label";
+    lbl.textContent = rowLabels.at(r);
+    grid.appendChild(lbl);
+
+    for (let c = 0; c < 3; c++) {
+      const slotIdx = r * 3 + c;
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.onclick = () => toggleReveal(slotIdx);
+
+      if (state.spread.length < 9) {
+        slot.innerHTML = "<div class='slot-align'>" + ALIGNMENTS.at(slotIdx) + "</div><div style='color:var(--muted); margin:auto;'>Пусто</div>";
+      } else {
+        const card = DECK.at(state.spread.at(slotIdx));
+        const isRev = state.revealed.at(slotIdx);
+        const isSuitMatch = isRev && card.suit === ch.suit;
+        const roleOwners = state.players.filter(p => p.roleCardId === card.id);
+
+        if (isRev && roleOwners.length > 0) slot.classList.add("role-match");
+        else if (isSuitMatch) slot.classList.add("suit-match");
+
+        if (!isRev) {
+          slot.innerHTML =
+            "<div class='slot-align'>" + ALIGNMENTS.at(slotIdx) + "</div>" +
+            "<div class='card-back'>✦</div>" +
+            "<div class='card-sub'>Нажмите, чтобы открыть</div>";
+        } else {
+          let tagsHtml = "";
+          if (isSuitMatch) tagsHtml += "<span class='tag suit'>Масть главы (+1 ОХ)</span>";
+          roleOwners.forEach(owner => {
+            if (card.alignIdx === slotIdx) tagsHtml += "<span class='tag role'>★ Роль: " + owner.name + " (Истинное +2)</span>";
+            else if (Number(OPPOSITE_MAP.charAt(card.alignIdx)) === slotIdx) tagsHtml += "<span class='tag opp'>⚠ Роль: " + owner.name + " (Противопол. +1)</span>";
+            else tagsHtml += "<span class='tag role'>Роль: " + owner.name + " (+1 ОХ)</span>";
+          });
+
+          slot.innerHTML =
+            "<div class='slot-align'>" + ALIGNMENTS.at(slotIdx) + "</div>" +
+            "<img class='card-img' src='" + card.file + "' alt='" + card.ru + "'>" +
+            "<div><div class='card-title'>" + card.ru + " (" + card.en + ")</div>" +
+            "<div class='card-sub'>" + SUITS[card.suit].name + " • " + ALIGNMENTS.at(card.alignIdx) + "</div>" +
+            "<div class='tags'>" + tagsHtml + "</div></div>";
+        }
+      }
+      grid.appendChild(slot);
+    }
+  }
+
+  document.getElementById("deckCount").textContent = 54 - (state.spread.length + state.extra.length);
+  const extraDiv = document.getElementById("extraCards");
+  extraDiv.innerHTML = "";
+  state.extra.forEach(id => {
+    const c = DECK.at(id);
+    const el = document.createElement("div");
+    el.className = "mini-card";
+    el.innerHTML = "<img src='" + c.file + "'><div>" + c.ru + "</div>";
+    extraDiv.appendChild(el);
+  });
 }
-});
-slot.innerHTML =
-"" + ALIGNMENTS.at(slotIdx) + "" +
-"" +
-"" +
-"" + card.ru + " (" + card.en + ")" +
-"" + SUITS[card.suit].name + " • " + ALIGNMENTS.at(card.alignIdx) + "" +
-"" + tagsHtml + "" +
-"";
-}
-}
-grid.appendChild(slot);
-}
-}
-const usedCount = state.spread.length + state.extra.length;
-document.getElementById("deckCount").textContent = 54 - usedCount;
-const extraDiv = document.getElementById("extraCards");
-extraDiv.innerHTML = "";
-state.extra.forEach(id => {
-const c = DECK.at(id);
-const el = document.createElement("div");
-el.className = "mini-card";
-el.innerHTML = "" + c.ru + "";
-extraDiv.appendChild(el);
-});
-}
-init();  
+
+init();
+</script>
+</body>
+</html>
