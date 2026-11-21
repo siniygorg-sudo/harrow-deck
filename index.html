@@ -301,7 +301,10 @@ sel.appendChild(opt);
 });
 if (location.hash.length > 1) {
 try {
-const decoded = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
+      let b64 = location.hash.slice(1).replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(b64))));
+
 Object.assign(state, decoded);
 } catch (e) {}
 }
@@ -309,8 +312,9 @@ sel.value = state.chapter;
 render();
 }
 function saveToHash() {
-const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-history.replaceState(null, "", "#" + encoded);
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(state))))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  history.replaceState(null, "", "#" + encoded);
 }
 function changeChapter() {
 state.chapter = Number(document.getElementById("chapterSelect").value);
