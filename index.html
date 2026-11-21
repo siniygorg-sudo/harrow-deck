@@ -159,14 +159,36 @@ const MEANINGS = `
 Разрушительная, вероломная любовь, одержимость и безответная страсть. (Противопол.: исцеление от наваждения и горькая правда).
 `.trim().split("\n");
 
-function openMeaning(cardId) {
+function getAlignmentMatch(cardAlignIdx, slotIdx) {
+  if (slotIdx === undefined || slotIdx === null) return "";
+  if (cardAlignIdx === slotIdx) return "true";
+  if (Number(OPPOSITE_MAP.charAt(cardAlignIdx)) === slotIdx) return "opp";
+  const cRow = Math.floor(cardAlignIdx / 3), cCol = cardAlignIdx % 3;
+  const sRow = Math.floor(slotIdx / 3), sCol = slotIdx % 3;
+  if (cRow === sRow || cCol === sCol) return "part";
+  return "";
+}
+
+function openMeaning(cardId, slotIdx) {
   const c = DECK.at(cardId);
   document.getElementById("mImg").src = c.file;
   document.getElementById("mTitle").textContent = c.ru + " (" + c.en + ")";
   document.getElementById("mMeta").textContent = SUITS[c.suit].name + " (" + SUITS[c.suit].stat + ") • " + ALIGNMENTS.at(c.alignIdx);
-  document.getElementById("mText").textContent = MEANINGS.at(cardId);
+  
+  const match = getAlignmentMatch(c.alignIdx, slotIdx);
+  let posHint = "";
+  if (match === "true") {
+    posHint = "<div style='background:rgba(16,185,129,0.2);border:1px solid #10b981;padding:8px;border-radius:6px;margin-bottom:10px;font-size:13px;color:#6ee7b7;'><strong>★ Истинное совпадение (True Match):</strong> Карта легла точно в своё мировоззрение (" + ALIGNMENTS.at(slotIdx) + "). Она имеет наивысшую важность для гадания и трактуется в прямом смысле.</div>";
+  } else if (match === "opp") {
+    posHint = "<div style='background:rgba(239,68,68,0.2);border:1px solid #ef4444;padding:8px;border-radius:6px;margin-bottom:10px;font-size:13px;color:#fca5a5;'><strong>⚠ Противоположное совпадение (Opposite Match):</strong> Карта легла в противоположный угол (" + ALIGNMENTS.at(slotIdx) + "). Всегда трактуется в перевёрнутом/искажённом смысле (см. «Противопол.» в скобках) и предвещает судьбоносное событие.</div>";
+  } else if (match === "part") {
+    posHint = "<div style='background:rgba(245,158,11,0.2);border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:10px;font-size:13px;color:#fcd34d;'><strong>◈ Частичное совпадение (Partial Match):</strong> Совпадает половина мировоззрения со слотом (" + ALIGNMENTS.at(slotIdx) + "). Повышенная важность; по усмотрению ведущего может трактоваться как в прямом, так и в искажённом виде.</div>";
+  }
+
+  document.getElementById("mText").innerHTML = posHint + MEANINGS.at(cardId);
   document.getElementById("meaningModal").style.display = "flex";
 }
+
 
 let state = { chapter: 1, players: [], spread: [], revealed: [false,false,false,false,false,false,false,false,false], extra: [] };
 
@@ -301,13 +323,18 @@ function render() {
         if (!isRev) {
           slot.innerHTML = "<div class='slot-align'>" + ALIGNMENTS.at(slotIdx) + "</div><div class='card-back'>✦</div><div class='card-sub'>Нажмите, чтобы открыть</div>";
         } else {
-          let tagsHtml = isSuitMatch ? "<span class='tag suit'>Масть главы (+1 ОХ)</span>" : "";
+                   let tagsHtml = isSuitMatch ? "<span class='tag suit'>Масть главы (+1 ОХ)</span>" : "";
+          const posMatch = getAlignmentMatch(card.alignIdx, slotIdx);
+          if (posMatch === "true") tagsHtml += "<span class='tag role'>★ Истинное совпадение</span>";
+          else if (posMatch === "opp") tagsHtml += "<span class='tag opp'>⚠ Противоположность</span>";
+          else if (posMatch === "part") tagsHtml += "<span class='tag' style='background:rgba(245,158,11,0.25);color:#fcd34d;'>◈ Частичное</span>";
+
           roleOwners.forEach(owner => {
-            if (card.alignIdx === slotIdx) tagsHtml += "<span class='tag role'>★ Роль: " + owner.name + " (Истинное +2)</span>";
-            else if (Number(OPPOSITE_MAP.charAt(card.alignIdx)) === slotIdx) tagsHtml += "<span class='tag opp'>⚠ Роль: " + owner.name + " (Противопол. +1)</span>";
+            if (card.alignIdx === slotIdx) tagsHtml += "<span class='tag role'>Роль: " + owner.name + " (+2 ОХ)</span>";
             else tagsHtml += "<span class='tag role'>Роль: " + owner.name + " (+1 ОХ)</span>";
           });
-                    slot.innerHTML = "<div class='slot-align'>" + ALIGNMENTS.at(slotIdx) + "</div><img class='card-img' src='" + card.file + "' alt='" + card.ru + "'><div><div class='card-title'>" + card.ru + " (" + card.en + ")</div><div class='card-sub'>" + SUITS[card.suit].name + " • " + ALIGNMENTS.at(card.alignIdx) + "</div><div class='tags'>" + tagsHtml + "</div><button onclick='event.stopPropagation();openMeaning(" + card.id + ")' style='margin-top:6px;padding:3px 8px;font-size:11px;'>📖 Значение</button></div>";
+
+                    slot.innerHTML = "<div class='slot-align'>" + ALIGNMENTS.at(slotIdx) + "</div><img class='card-img' src='" + card.file + "' alt='" + card.ru + "'><div><div class='card-title'>" + card.ru + " (" + card.en + ")</div><div class='card-sub'>" + SUITS[card.suit].name + " • " + ALIGNMENTS.at(card.alignIdx) + "</div><div class='tags'>" + tagsHtml + "</div><button onclick='event.stopPropagation();openMeaning(" + card.id + "," + slotIdx + ")' style='margin-top:6px;padding:3px 8px;font-size:11px;'>📖 Значение</button></div>";
         }
       }
       grid.appendChild(slot);
