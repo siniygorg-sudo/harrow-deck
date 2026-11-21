@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Колода Харроу — Проклятие Алого Трона</title>
+<style>
+  :root {
+    --bg: #141115;
+    --panel: #1f1a21;
+    --border: #4a3b32;
+    --gold: #d4af37;
+    --crimson: #9e2a2b;
+    --text: #ece4d8;
+    --muted: #a3988c;
+    --match-suit: #3b82f6;
+    --match-role: #10b981;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  h1, h2, h3 {
+    margin: 0 0 10px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--panel);
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  select, input, button {
+    background: #2b242e;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  button {
+    cursor: pointer;
+    transition: 0.15s;
+    font-weight: 500;
+  }
+  button:hover {
+    border-color: var(--gold);
+    background: #382f3c;
+  }
+  button.primary {
+    background: var(--crimson);
+    border-color: #c94a4a;
+    color: #fff;
+  }
+  button.primary:hover {
+    background: #b53334;
+  }
+  button.gold-btn {
+    background: #594616;
+    border-color: var(--gold);
+    color: #fff;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 920px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+  .card-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .rules-hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .rules-hint strong {
+    color: var(--text);
+  }
+  .player-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px;
+    background: #262029;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #362d3a;
+  }
+  .player-info {
+    font-size: 13px;
+  }
+  .player-role {
+    color: var(--gold);
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+  }
+  .hp-badge {
+    background: var(--crimson);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  .spread-header {
+    display: grid;
+    grid-template-columns: 44px repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .spread-grid {
+    display: grid;
+    grid-template-columns: 44px repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+  }
+  .row-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    justify-self: center;
+    align-self: center;
+  }
+  .slot {
+    background: #19151b;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    position: relative;
+    min-height: 270px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.2s;
+  }
+  .slot:hover {
+    transform: translateY(-2px);
+  }
+  .slot.suit-match {
+    border-color: var(--match-suit);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+  }
+  .slot.role-match {
+    border-color: var(--match-role);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+  }
+  .slot-align {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .card-img {
+    width: 100%;
+    max-width: 155px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+    margin: 0 auto;
+    display: block;
+    border: 1px solid #333;
+  }
+  .card-back {
+    width: 100%;
+    max-width: 155px;
+    aspect-ratio: 2 / 3;
+    margin: 0 auto;
+    border-radius: 6px;
+    border: 2px solid var(--gold);
+    background: radial-gradient(circle, #3b1d2a 0%, #1a1118 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 28px;
+    user-select: none;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .tag.suit {
+    background: rgba(59, 130, 246, 0.25);
+    color: #93c5fd;
+  }
+  .tag.role {
+    background: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+  }
+  .tag.opp {
+    background: rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+  }
+  .extra-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .mini-card {
+    width: 96px;
+    text-align: center;
+    font-size: 11px;
+  }
+  .mini-card img {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #333;
+  }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--gold);
+    color: #141115;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: none;
+    z-index: 99;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top-bar">
+    <div>
+      <h1>Колода Харроу: Проклятие Алого Трона</h1>
+      <div style="font-size:13px; color:var(--muted);">Нажмите на закрытую карту в раскладе, чтобы перевернуть её</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="gold-btn" onclick="copyShareLink()">Скопировать ссылку для игроков</button>
+      <button onclick="resetAll()">Сбросить всё</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="card-box">
+        <h3>1. Глава кампании</h3>
+        <select id="chapterSelect" style="width:100%; margin-bottom:10px;" onchange="changeChapter()"></select>
+        <div id="chapterInfo" class="rules-hint"></div>
+      </div>
+
+      <div class="card-box">
+        <h3>2. Этап «Выбор» (Карты Роли)</h3>
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+          <input type="text" id="playerNameInput" placeholder="Имя персонажа..." style="flex:1;" onkeydown="if(event.key==='Enter') addPlayer()">
+          <button onclick="addPlayer()">+ Добавить</button>
+        </div>
+        <button class="primary" style="width:100%; margin-bottom:10px;" onclick="dealRoleCards()">Раздать Карты Роли (из масти главы)</button>
+        <div id="playersList"></div>
+      </div>
+
+      <div class="card-box">
+        <h3>3. Добор из остатка колоды</h3>
+        <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
+          Осталось в колоде: <strong id="deckCount" style="color:var(--text);">54</strong> карт
+        </div>
+        <button style="width:100%;" onclick="drawExtraCard()">Вытянуть случайную карту</button>
+        <div id="extraCards" class="extra-cards"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3>4. Расклад Харроу (3×3)</h3>
+          <div style="display:flex; gap:8px;">
+            <button class="primary" onclick="dealSpread()">Сделать новый расклад</button>
+            <button onclick="revealAll()">Открыть все карты</button>
+          </div>
+        </div>
+
+        <div class="spread-header">
+          <div></div>
+          <div>Прошлое (Закон)</div>
+          <div>Настоящее (Нейтр.)</div>
+          <div>Будущее (Хаос)</div>
+        </div>
+        <div id="spreadGrid" class="spread-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Ссылка скопирована!</div>
+
+<script>
+const SUITS = {
+  hammers: { name: "Молоты", stat: "Сила" },
+  keys:    { name: "Ключи",  stat: "Ловкость" },
+  shields: { name: "Щиты",   stat: "Выносливость" },
+  books:   { name: "Книги",  stat: "Интеллект" },
+  stars:   { name: "Звёзды", stat: "Мудрость" },
+  crowns:  { name: "Короны", stat: "Харизма" }
+};
+
+const CHAPTERS = [
+  {
+    id: 1, title: "Глава 1: На краю анархии", suit: "keys",
+    spend: "Трата Очков Харроу: переброс проверки Ловкости (до оглашения результата), +1 к скорости на сцену или бонус уклонения +2 к КБ на 1 раунд."
+  },
+  {
+    id: 2, title: "Глава 2: Семь дней до могилы", suit: "shields",
+    spend: "Трата Очков Харроу: переброс спасброска Стойкости или проверки Выносливости, +2 к спасброскам против болезней на день, либо лечение 1к8+уровень ПЗ."
+  },
+  {
+    id: 3, title: "Глава 3: Побег из Старой Корвосы", suit: "books",
+    spend: "Трата Очков Харроу: переброс проверки Интеллекта или Знаний, получение подсказки от ведущего, либо +2 к КБ/спасброскам против ловушек и загадок."
+  },
+  {
+    id: 4, title: "Глава 4: История пепла", suit: "hammers",
+    spend: "Трата Очков Харроу: переброс броска атаки или проверки Силы, +2 к урону в ближнем бою на 1 раунд, либо игнорирование штрафных условий усталости на сцену."
+  },
+  {
+    id: 5, title: "Глава 5: Скелеты Скарволла", suit: "stars",
+    spend: "Трата Очков Харроу: переброс спасброска Воли или проверки Внимания/Проницательности, либо +2 к спасброскам против эффектов страха и нежити."
+  },
+  {
+    id: 6, title: "Глава 6: Корона клыков", suit: "crowns",
+    spend: "Трата Очков Харроу: переброс проверки Харизмы (Дипломатия, Блеф, Запугивание) или бонус +2 к КБ/спасброскам против зачарования и контроля разума."
+  }
+];
+
+const ALIGNMENTS = [
+  "Законно-Добрый", "Нейтрально-Добрый", "Хаотично-Добрый",
+  "Законно-Нейтральный", "Истинно Нейтральный", "Хаотично-Нейтральный",
+  "Законно-Злой", "Нейтрально-Злой", "Хаотично-Злой"
+];
+
+const OPPOSITE_SLOT = { 0:8, 1:7, 2:6, 3:5, 4:4, 5:3, 6:2, 7:1, 8:0 };
+
+const RAW_CARDS = [
+  ["Паладин", "Paladin", "hammers", "01_paladin.png"],
+  ["Твердыня", "Keep", "hammers", "02_keep.png"],
+  ["Небо", "Sky", "hammers", "03_sky.png"],
+  ["Кузница", "Forge", "hammers", "04_forge.png"],
+  ["Медведь", "Bear", "hammers", "05_bear.png"],
+  ["Восстание", "Uprising", "hammers", "06_uprising.png"],
+  ["Исчадие", "Fiend", "hammers", "07_fiend.png"],
+  ["Избиение", "Beating", "hammers", "08_beating.png"],
+  ["Циклон", "Cyclone", "hammers", "09_cyclone.png"],
+
+  ["Танец", "Dance", "keys", "10_dance.png"],
+  ["Сверчок", "Cricket", "keys", "11_cricket.png"],
+  ["Жонглёр", "Juggler", "keys", "12_juggler.png"],
+  ["Замочник", "Locksmith", "keys", "13_locksmith.png"],
+  ["Павлин", "Peacock", "keys", "14_peacock.png"],
+  ["Кролик", "Rabbit", "keys", "15_rabbit.png"],
+  ["Лавина", "Avalanche", "keys", "16_avalanche.png"],
+  ["Вороны", "Crows", "keys", "17_crows.png"],
+  ["Фонарь", "Lantern", "keys", "18_lantern.png"],
+
+  ["Труба", "Trumpet", "shields", "19_trumpet.png"],
+  ["Выживший", "Survivor", "shields", "20_survivor.png"],
+  ["Пустыня", "Desert", "shields", "21_desert.png"],
+  ["Медь", "Brass", "shields", "22_brass.png"],
+  ["Возница", "Teamster", "shields", "23_teamster.png"],
+  ["Гора", "Mountain", "shields", "24_mountain.png"],
+  ["Терновник", "Briar", "shields", "25_briar.png"],
+  ["Хворь", "Sickness", "shields", "26_sickness.png"],
+  ["Восковые фигуры", "Waxworks", "shields", "27_waxworks.png"],
+
+  ["Истина", "Truth", "books", "28_truth.png"],
+  ["Странник", "Wanderer", "books", "29_wanderer.png"],
+  ["Шутка", "Joke", "books", "30_joke.png"],
+  ["Инквизитор", "Inquisitor", "books", "31_inquisitor.png"],
+  ["Торговец", "Trader", "books", "32_trader.png"],
+  ["Видение", "Vision", "books", "33_vision.png"],
+  ["Ракшаса", "Rakshasa", "books", "34_rakshasa.png"],
+  ["Идиот", "Idiot", "books", "35_idiot.png"],
+  ["Змеиный укус", "Snakebite", "books", "36_snakebite.png"],
+
+  ["Змей", "Serpent", "stars", "37_serpent.png"],
+  ["Повитуха", "Midwife", "stars", "38_midwife.png"],
+  ["Трактирщик", "Publican", "stars", "39_publican.png"],
+  ["Королева", "Queen", "stars", "40_queen.png"],
+  ["Сова", "Owl", "stars", "41_owl.png"],
+  ["Карнавал", "Carnival", "stars", "42_carnival.png"],
+  ["Затмение", "Eclipse", "stars", "43_eclipse.png"],
+  ["Карга", "Hag", "stars", "44_hag.png"],
+  ["Потерянный", "Lost", "stars", "45_lost.png"],
+
+  ["Трон", "Throne", "crowns", "46_throne.png"],
+  ["Театр", "Theater", "crowns", "47_theater.png"],
+  ["Единорог", "Unicorn", "crowns", "48_unicorn.png"],
+  ["Брак", "Marriage", "crowns", "49_marriage.png"],
+  ["Близнец", "Twin", "crowns", "50_twin.png"],
+  ["Куртизанка", "Courtesan", "crowns", "51_courtesan.png"],
+  ["Тиран", "Tyrant", "crowns", "52_tyrant.png"],
+  ["Предательство", "Betrayal", "crowns", "53_betrayal.png"],
+  ["Лжец", "Liar", "crowns", "54_liar.png"]
+];
+
+const DECK = RAW_CARDS.map((c, idx) => ({
+  id: idx,
+  ru: c[0],
+  en: c[1],
+  suit: c[2],
+  file: "cards/" + c[3],
+  alignIdx: idx % 9
+}));
+
+let state = {
+  chapter: 1,
+  players: [],
+  spread: [],
+  revealed: [false, false, false, false, false, false, false, false, false],
+  extra: []
+};
+
+function init() {
+  const sel = document.getElementById("chapterSelect");
+  CHAPTERS.forEach(ch => {
+    const opt = document.createElement("option");
+    opt.value = ch.id;
+    opt.textContent = ch.title + " (" + SUITS[ch.suit].name + ")";
+    sel.appendChild(opt);
+  });
+
+  if (location.hash.length > 1) {
+    try {
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
+      Object.assign(state, decoded);
+    } catch (e) {}
+  }
+  sel.value = state.chapter;
+  render();
+}
+
+function saveToHash() {
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  history.replaceState(null, "", "#" + encoded);
+}
+
+function changeChapter() {
+  state.chapter = Number(document.getElementById("chapterSelect").value);
+  render();
+}
+
+function addPlayer() {
+  const inp = document.getElementById("playerNameInput");
+  const name = inp.value.trim();
+  if (!name) return;
+  if (state.players.length >= 9) {
+    alert("Максимум 9 игроков на 9 карт масти!");
+    return;
+  }
+  state.players.push({ name: name, roleCardId: null });
+  inp.value = "";
+  render();
+}
+
+function removePlayer(idx) {
+  state.players.splice(idx, 1);
+  render();
+}
+
+function dealRoleCards() {
+  if (state.players.length === 0) {
+    alert("Сначала добавьте хотя бы одного игрока.");
+    return;
+  }
+  const ch = CHAPTERS.find(c => c.id === state.chapter);
+  const suitCards = DECK.filter(c => c.suit === ch.suit).map(c => c.id);
+  shuffle(suitCards);
+  state.players.forEach((p, i) => {
+    p.roleCardId = suitCards[i];
+  });
+  render();
+}
+
+function dealSpread() {
+  const ids = DECK.map(c => c.id);
+  shuffle(ids);
+  state.spread = ids.slice(0, 9);
+  state.revealed = new Array(9).fill(false);
+  state.extra = [];
+  render();
+}
+
+function toggleReveal(slotIdx) {
+  if (state.spread.length < 9) return;
+  state.revealed[slotIdx] = !state.revealed[slotIdx];
+  render();
+}
+
+function revealAll() {
+  if (state.spread.length < 9) return;
+  state.revealed = new Array(9).fill(true);
+  render();
+}
+
+function drawExtraCard() {
+  const used = new Set([...state.spread, ...state.extra]);
+  const avail = DECK.map(c => c.id).filter(id => !used.has(id));
+  if (avail.length === 0) {
+    alert("В колоде больше не осталось карт!");
+    return;
+  }
+  shuffle(avail);
+  state.extra.push(avail[0]);
+  render();
+}
+
+function resetAll() {
+  state = {
+    chapter: state.chapter,
+    players: [],
+    spread: [],
+    revealed: new Array(9).fill(false),
+    extra: []
+  };
+  render();
+}
+
+function copyShareLink() {
+  saveToHash();
+  navigator.clipboard.writeText(location.href).then(() => {
+    const t = document.getElementById("toast");
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 2200);
+  });
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function calcHarrowPoints(player) {
+  const ch = CHAPTERS.find(c => c.id === state.chapter);
+  let hp = 0;
+  state.spread.forEach((cardId, slotIdx) => {
+    if (!state.revealed[slotIdx]) return;
+    const card = DECK[cardId];
+    if (card.suit === ch.suit) hp += 1;
+    if (player.roleCardId === cardId) {
+      hp += 1;
+      if (card.alignIdx === slotIdx) hp += 1;
+    }
+  });
+  return hp;
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, m => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
+function render() {
+  saveToHash();
+  const ch = CHAPTERS.find(c => c.id === state.chapter);
+  const suitObj = SUITS[ch.suit];
+  document.getElementById("chapterInfo").innerHTML =
+    "<div><strong>Масть главы:</strong> " + suitObj.name + " (" + suitObj.stat + ")</div>" +
+    "<div style='margin-top:6px;'>" + ch.spend + "</div>";
+
+  const pList = document.getElementById("playersList");
+  pList.innerHTML = "";
+  state.players.forEach((p, idx) => {
+    const rCard = p.roleCardId !== null ? DECK[p.roleCardId] : null;
+    const hp = calcHarrowPoints(p);
+    const div = document.createElement("div");
+    div.className = "player-row";
+    div.innerHTML =
+      "<div class='player-info'>" +
+        "<strong>" + escapeHtml(p.name) + "</strong>" +
+        "<span class='player-role'>" + (rCard ? ("Роль: " + rCard.ru + " (" + rCard.en + ")") : "Карта Роли не вытянута") + "</span>" +
+      "</div>" +
+      "<div style='display:flex; align-items:center; gap:6px;'>" +
+        "<span class='hp-badge' title='Очки Харроу по открытым картам'>" + hp + " ОХ</span>" +
+        "<button onclick='removePlayer(" + idx + ")' style='padding:4px 8px;'>✕</button>" +
+      "</div>";
+    pList.appendChild(div);
+  });
+
+  const grid = document.getElementById("spreadGrid");
+  grid.innerHTML = "";
+  const rowLabels = ["Добро (Позитив)", "Нейтральность", "Зло (Негатив)"];
+
+  for (let r = 0; r < 3; r++) {
+    const lbl = document.createElement("div");
+    lbl.className = "row-label";
+    lbl.textContent = rowLabels[r];
+    grid.appendChild(lbl);
+
+    for (let c = 0; c < 3; c++) {
+      const slotIdx = r * 3 + c;
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.onclick = () => toggleReveal(slotIdx);
+
+      if (state.spread.length < 9) {
+        slot.innerHTML =
+          "<div class='slot-align'>" + ALIGNMENTS[slotIdx] + "</div>" +
+          "<div style='color:var(--muted); margin:auto;'>Пусто</div>" +
+          "<div></div>";
+      } else {
+        const card = DECK[state.spread[slotIdx]];
+        const isRev = state.revealed[slotIdx];
+        const isSuitMatch = isRev && card.suit === ch.suit;
+        const roleOwners = state.players.filter(p => p.roleCardId === card.id);
+
+        if (isRev && roleOwners.length > 0) slot.classList.add("role-match");
+        else if (isSuitMatch) slot.classList.add("suit-match");
+
+        if (!isRev) {
+          slot.innerHTML =
+            "<div class='slot-align'>" + ALIGNMENTS[slotIdx] + "</div>" +
+            "<div class='card-back'>✦</div>" +
+            "<div class='card-sub'>Нажмите, чтобы открыть</div>";
+        } else {
+          let tagsHtml = "";
+          if (isSuitMatch) {
+            tagsHtml += "<span class='tag suit'>Масть главы (+1 ОХ)</span>";
+          }
+          roleOwners.forEach(owner => {
+            const safeOwner = escapeHtml(owner.name);
+            if (card.alignIdx === slotIdx) {
+              tagsHtml += "<span class='tag role'>★ Роль: " + safeOwner + " (Истинное +2)</span>";
+            } else if (card.alignIdx !== 4 && OPPOSITE_SLOT[card.alignIdx] === slotIdx) {
+              tagsHtml += "<span class='tag opp'>⚠ Роль: " + safeOwner + " (Противопол. +1)</span>";
+            } else {
+              tagsHtml += "<span class='tag role'>Роль: " + safeOwner + " (+1 ОХ)</span>";
+            }
+          });
+
+          slot.innerHTML =
+            "<div class='slot-align'>" + ALIGNMENTS[slotIdx] + "</div>" +
+            "<img class='card-img' src='" + card.file + "' alt='" + card.ru + "'>" +
+            "<div>" +
+              "<div class='card-title'>" + card.ru + " (" + card.en + ")</div>" +
+              "<div class='card-sub'>" + SUITS[card.suit].name + " • " + ALIGNMENTS[card.alignIdx] + "</div>" +
+              "<div class='tags'>" + tagsHtml + "</div>" +
+            "</div>";
+        }
+      }
+      grid.appendChild(slot);
+    }
+  }
+
+  const usedCount = state.spread.length + state.extra.length;
+  document.getElementById("deckCount").textContent = 54 - usedCount;
+  const extraDiv = document.getElementById("extraCards");
+  extraDiv.innerHTML = "";
+  state.extra.forEach(id => {
+    const c = DECK[id];
+    const el = document.createElement("div");
+    el.className = "mini-card";
+    el.innerHTML = "<img src='" + c.file + "' alt='" + c.ru + "'><div>" + c.ru + "</div>";
+    extraDiv.appendChild(el);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
